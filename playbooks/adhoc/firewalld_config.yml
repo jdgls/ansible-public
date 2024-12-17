@@ -1,0 +1,48 @@
+---
+- name: Firewall config
+  hosts: # Insert host
+  become: true
+  vars:
+    default_zone: # public
+    enabled_services:
+     # - http
+     # - https
+    enabled_ports:
+     # - 23/tcp
+     # - 8080/tcp
+
+  tasks:
+
+    - name: Ensure firewalld is enabled and running
+      ansible.builtin.service:
+        name: firewalld
+        state: running
+        enabled: true
+
+    - name: Set default zone
+      ansible.posix.firewalld:
+        zone: "{{ default_zone }}"
+        state: enabled
+        immediate: true
+        permanent: true
+
+    - name: Enable services
+      ansible.posix.firewalld:
+        service: "{{ item }}"
+        state: enabled
+        immediate: true
+        permanent: true
+      loop: "{{ enabled_services }}"
+
+    - name: Enabled enabled_ports
+      ansible.posix.firewalld:
+        port: "{{ item }}"
+        state: enabled
+        immediate: true
+        permanent: true
+      loop: "{{ enabled_ports }}"
+
+    - name: Refresh firewalld
+      ansible.builtin.service:
+        name: firewalld
+        state: reloaded
