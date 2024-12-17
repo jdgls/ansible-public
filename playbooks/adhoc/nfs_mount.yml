@@ -1,0 +1,23 @@
+---
+- name: Configure NFS shares
+  hosts: # insert hosts
+  become: true
+  vars:
+    source: # 0.0.0.0:/path/to/mnt
+    target: # /path/to/mnt
+
+  tasks:
+
+    - name: Ensure target mountpoint exists
+      ansible.builtin.file:
+        path: "{{ target }}"
+        state: directory
+        mode: "0644"
+
+    - name: Mount {{ target }}
+      ansible.posix.mount:
+        src: "{{ source }}"
+        path: "{{ target }}"
+        opts: rw
+        state: mounted
+        fstype: nfs
